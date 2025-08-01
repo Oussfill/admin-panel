@@ -32,41 +32,35 @@ class CategoryProvider extends ChangeNotifier {
   }
 
   Future<void> addCategory() async {
-    try {
-      Map<String, dynamic> formDataMap = {
-        'name': categoryNameCtrl.text,
-        'image': selectedImage != null ? 'has_image' : 'no_url',
-        'show_name': showName,
-      };
+  try {
+    // البيانات النصية
+    Map<String, dynamic> formDataMap = {
+      'name': categoryNameCtrl.text,
+      'image': selectedImage != null ? 'has_image' : 'no_url',
+      'show_name': showName.toString(),
+    };
 
-      final FormData form =
-          await createFormData(imgXFile: imgXFile, formData: formDataMap);
-
-      final response =
-          await service.addItem(endpointUrl: 'categories', itemData: form);
-
-      if (response.isOk) {
-        ApiResponse apiResponse = ApiResponse.fromJson(response.body, null);
-
-        if (apiResponse.success == true) {
-          clearFields();
-          SnackBarHelper.showSuccessSnackBar(apiResponse.message);
-          log('Category added');
-          _dataProvider.getAllCategories();
-        } else {
-          SnackBarHelper.showErrorSnackBar(
-              'Failed to add category: ${apiResponse.message}');
-        }
-      } else {
-        SnackBarHelper.showErrorSnackBar(
-            'Error: ${response.body?['message'] ?? response.statusText}');
-      }
-    } catch (e) {
-      print(e);
-      SnackBarHelper.showErrorSnackBar('An error occurred: $e');
-      rethrow;
+    // الصور (إن وُجدت)
+    List<Map<String, XFile?>> imgXFiles = [];
+    if (imgXFile != null) {
+      imgXFiles.add({'image': imgXFile}); // المفتاح يجب أن يكون ما ينتظره الـ backend
     }
+
+    // استدعاء الدالة العامة
+    await service.uploadcategoriy(
+      fields: formDataMap,
+      imgXFiles: imgXFiles,
+    );
+
+    // يمكنك هنا بعد النجاح عرض رسالة أو إعادة تحميل البيانات
+    clearFields();
+    _dataProvider.getAllCategories();
+  } catch (e) {
+    print("❌ Exception in addCategory: $e");
+    SnackBarHelper.showErrorSnackBar('حدث خطأ أثناء إضافة الفئة: $e');
   }
+}
+
 
   Future<void> updateCategory() async {
     try {

@@ -92,7 +92,10 @@ DataRow orderDataRow(BuildContext context, Order orderInfo, int index,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-              child: Text(orderInfo.userID?.name ?? ''),
+              child: Text(
+                  orderInfo.userID?.name ?? orderInfo.guestInfo?.name ?? 'Guest'
+
+                ),
             ),
           ],
         ),

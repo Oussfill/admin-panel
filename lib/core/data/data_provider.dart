@@ -5,6 +5,7 @@ import 'package:admin/utility/snack_bar_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../models/category.dart';
 import '../../models/brand.dart';

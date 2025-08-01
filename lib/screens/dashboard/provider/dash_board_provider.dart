@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
@@ -36,6 +37,7 @@ class DashBoardProvider extends ChangeNotifier {
   List<String> selectedVariants = [];
 
   Product? productForUpdate;
+  
   File? selectedMainImage,
       selectedSecondImage,
       selectedThirdImage,
@@ -49,6 +51,52 @@ class DashBoardProvider extends ChangeNotifier {
   List<String> variantsByVariantType = [];
 
   DashBoardProvider(this._dataProvider);
+
+
+  addProducts() async {
+  try {
+    if (selectedMainImage == null) {
+      SnackBarHelper.showErrorSnackBar('Please choose an image!');
+      return;
+    }
+  
+    Map<String, dynamic> formDataMap = {
+      'name': productNameCtrl.text,
+      'description': productDescCtrl.text,
+      'proCategoryId': selectedCategory?.sId ?? '',
+      'proSubCategoryId': selectedSubCategory?.sId ?? '',
+      'proBrandId': selectedBrand?.sId ?? '',
+      'price': productPriceCtrl.text,
+      'offerPrice': productOffPriceCtrl.text.isEmpty
+          ? productPriceCtrl.text
+          : productOffPriceCtrl.text,
+      'quantity': productQntCtrl.text,
+      'proVariantTypeId': selectedVariantType?.sId ?? '',
+      'proVariantId': selectedVariants,
+    };
+
+    // تحضير الصور
+    final imageList = [
+      {'image1': imgXFile1},
+      {'image2': imgXFile2},
+      {'image3': imgXFile3},
+      {'image4': imgXFile4},
+      {'image5': imgXFile5},
+    ];
+
+    // رفع المنتج
+     await service.uploadProduct(
+      fields: formDataMap,
+      imgXFiles: imageList,
+    );
+
+    // تحليل النتيج
+}catch (e) {
+      print(e);
+      SnackBarHelper.showErrorSnackBar('An error occurred: $e');
+      rethrow;
+    }
+}
 
   addProduct() async {
     try {
@@ -161,7 +209,7 @@ class DashBoardProvider extends ChangeNotifier {
     }
   }
 
-  submitProduct() => productForUpdate != null ? updateProduct() : addProduct();
+  submitProduct() => productForUpdate != null ? updateProduct() : addProducts();
 
   deleteProduct(Product product) async {
     try {
@@ -232,11 +280,12 @@ class DashBoardProvider extends ChangeNotifier {
           }
         }
       }
+      
     }
 
     // Create and return the FormData object
-    final FormData form = FormData(formData);
-    return form;
+  
+    return   FormData(formData);
   }
 
   filterSubcategory(Category category) {
